@@ -17,6 +17,8 @@ session = cnx.session()
 
 my_dataframe = session.table("SMOOTHIES.PUBLIC.FRUIT_OPTIONS").select(col('FRUIT_NAME'));
 # st.dataframe(data=my_dataframe, use_container_width=True)
+# --- FIX 1: Convert Snowflake Dataframe to Pandas so Multiselect works ---
+pd_df = my_dataframe.to_pandas()
 
 ingredients_list = st.multiselect(
     'choose upto 5 ingredients:'
@@ -46,8 +48,10 @@ if ingredients_list:
     
     st.success('Your Smoothie is ordered', icon="✅")
 
-# New section to display smoothiefroot nutrition information
-smoothiefroot_response = requests.get("[https://my.smoothiefroot.com/api/fruit/watermelon](https://my.smoothiefroot.com/api/fruit/watermelon)")  
-# st.text(smoothiefroot_response)
-sf_df = st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
+# --- FIX 2: Clean the URL (Removed the Markdown brackets) ---
+# This is the line that was causing the "Connection Adapter" error
+smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
+
+# Display the nutrition info as shown in your image
+st.dataframe(data=smoothiefroot_response.json(), use_container_width=True)
 
